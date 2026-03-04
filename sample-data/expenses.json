@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "requester": "+61400000001",
+    "date": "2026-02-01",
+    "vendor": "Café Roma",
+    "description": "Lunch x2 — flat white, chicken sandwich, brownie",
+    "amount_ex_gst": 25.00,
+    "gst": 2.50,
+    "total": 27.50,
+    "category": "lunch_reimbursement",
+    "timestamp": "2026-02-01T12:34:00+11:00"
+  },
+  {
+    "id": 2,
+    "requester": "+61400000001",
+    "date": "2026-02-08",
+    "vendor": "Bay Bakery",
+    "description": "Sandwiches, 2x coffee",
+    "amount_ex_gst": 16.36,
+    "gst": 1.64,
+    "total": 18.00,
+    "category": "lunch_reimbursement",
+    "timestamp": "2026-02-08T12:15:00+11:00"
+  },
+  {
+    "id": 3,
+    "requester": "+61400000001",
+    "date": "2026-02-15",
+    "vendor": "Pad Thai Palace",
+    "description": "Pad thai, green curry, 2x water",
+    "amount_ex_gst": 29.09,
+    "gst": 2.91,
+    "total": 32.00,
+    "category": "lunch_reimbursement",
+    "timestamp": "2026-02-15T12:45:00+11:00"
+  },
+  {
+    "id": 4,
+    "requester": "+61400000002",
+    "date": "2026-02-22",
+    "vendor": "The Corner Deli",
+    "description": "Wraps x2, juice",
+    "amount_ex_gst": 22.73,
+    "gst": 2.27,
+    "total": 25.00,
+    "category": "lunch_reimbursement",
+    "timestamp": "2026-02-22T13:00:00+11:00"
+  },
+  {
+    "id": 5,
+    "requester": "+61400000001",
+    "date": "2026-03-01",
+    "vendor": "Grounds of Alexandria",
+    "description": "Burger, salad, long black",
+    "amount_ex_gst": 31.82,
+    "gst": 3.18,
+    "total": 35.00,
+    "category": "lunch_reimbursement",
+    "timestamp": "2026-03-01T12:20:00+11:00"
+  }
+]
