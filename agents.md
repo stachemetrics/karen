@@ -176,6 +176,43 @@ metadata:
 4. Save the expense by appending to `~/.openclaw/workspace/karen-data/expenses.json`
 5. Each expense record must include the `requester` field (sender's phone number from the message context) — see data model below.
 
+### When the user logs time:
+1. Parse: description, hours, client, date (default today), rate (use their default rate if set, otherwise ask once and remember it for this session).
+2. Calculate: `amount_ex_gst = hours × rate`, `gst = amount_ex_gst / 11`, `total = amount_ex_gst + gst`.
+3. Confirm back in one line:
+   > "Logged — 3.5 hrs for Acme Corp @ $120/hr = $462 incl. GST. ✅"
+4. Write the time entry to expenses.json with `type: "time"` and `billing_status: "unbilled"`.
+5. If no client is mentioned, ask: "Which client is this for?"
+
+### When the user wants to see what's unbilled:
+1. Filter expenses.json to `requester` + `billing_status: "unbilled"`.
+2. If a client is specified (e.g. "what's unbilled for Acme?"), filter further.
+3. Reply with a grouped summary — no file attachment, just a WhatsApp message:
+   > "Unbilled for Acme Corp:
+   > • 3.5 hrs site visit (1 Feb) — $462
+   > • 2 hrs design (3 Feb) — $240
+   > • Cable reel (4 Feb) — $55
+   > **Total: $757 incl. GST**
+   > Reply 'invoice Acme' to generate the invoice."
+
+### When the user asks to invoice a client:
+**This is a two-step approval flow — never generate without confirmation.**
+
+1. Filter to unbilled items for that client (and optional date range if specified).
+2. Show a summary for approval — one WhatsApp message, no attachment:
+   > "Here's what I'll put on the invoice for Acme Corp:
+   > • Site visit, 3.5 hrs — $462
+   > • Design work, 2 hrs — $240
+   > • Materials: cable reel — $55
+   > **Total: $757 incl. GST**
+   > Reply 'send it' to generate the invoice, or tell me what to change."
+3. Wait for confirmation. If they say 'send it' (or similar):
+   - Run `generate_report.py` with the filtered item IDs and `--format invoice`
+   - Mark those records as `billing_status: "invoiced"` and stamp `invoice_id`
+   - Send the file: "Done — invoice attached. 🧾"
+4. If they ask to remove or adjust an item, update and re-show the summary before generating.
+5. **Never include another user's records. Never invoice already-invoiced items.**
+
 ### When the user asks for a report:
 1. Run: `python3 {baseDir}/scripts/generate_report.py --requester <sender_phone>`
 2. The script reads expenses.json, filters to only that requester's expenses, and produces an Excel file.
@@ -243,22 +280,52 @@ metadata:
 
 ## Data Model (phone-number scoped)
 
-Each expense record includes a `requester` field — the E.164 phone number of the sender. This is the authentication layer: Karen only shows/reports expenses belonging to the requesting phone number.
+Each record includes a `requester` field — the E.164 phone number of the sender. This is the authentication layer: Karen only shows/reports records belonging to the requesting phone number.
 
+### Entry types
+
+**Material / expense (receipt photo):**
 ```json
 {
   "id": 1,
+  "type": "material",
   "requester": "+61412345678",
+  "client": "Acme Corp",
   "date": "2026-02-01",
   "vendor": "Café Roma",
   "description": "Lunch x2 — flat white, chicken sandwich, brownie",
   "amount_ex_gst": 25.00,
   "gst": 2.50,
   "total": 27.50,
-  "category": "lunch_reimbursement",
+  "billing_status": "unbilled",
+  "invoice_id": null,
   "timestamp": "2026-02-01T12:34:00+11:00"
 }
 ```
+
+**Time entry (logged by message):**
+```json
+{
+  "id": 2,
+  "type": "time",
+  "requester": "+61412345678",
+  "client": "Acme Corp",
+  "date": "2026-02-01",
+  "description": "Site visit — cabling install, first floor",
+  "hours": 3.5,
+  "rate": 120.00,
+  "amount_ex_gst": 420.00,
+  "gst": 42.00,
+  "total": 462.00,
+  "billing_status": "unbilled",
+  "invoice_id": null,
+  "timestamp": "2026-02-01T16:00:00+11:00"
+}
+```
+
+**`billing_status` values:** `unbilled` → `invoiced` → `paid`
+
+**`client` field:** free text, normalised to title case. Karen should ask for a client name if not provided in context. Allows partial invoicing — only items for a specific client are included in a given invoice run.
 
 **How `requester` gets populated:**
 - OpenClaw normalises WhatsApp senders to E.164 format
@@ -548,12 +615,18 @@ Any user can ask Karen to set a recurring reminder from within their WhatsApp co
 
 ## Phase 2 Roadmap (post-demo)
 
-1. **Invoice generation** — fill .docx template from stored expenses
-2. **Google Form submission** — automate reimbursement submission
-3. **Xero/QuickBooks integration** — push expenses to accounting software
-4. **Multi-user** — other team members use Karen via WhatsApp group
-5. **Daily per-user rate limiting** — prevent API cost blowout from public demo
-6. **Publish to ClawHub** — let others install and adapt the skill
+1. **Time logging** — "3 hrs on Acme today" → time entry with client + rate
+2. **Client field on all entries** — tag materials/receipts to a client at log time or retroactively
+3. **Unbilled view** — "what's unbilled for Acme?" → grouped summary in WhatsApp
+4. **Approval flow + invoice generation** — conversational confirmation before generating invoice; mark items as `invoiced` after; fill a simple invoice template (PDF or .docx)
+5. **Partial billing** — invoice by client, date range, or handpicked items; never double-bill
+6. **Default hourly rate** — user sets once ("my rate is $120/hr"), Karen remembers it per requester
+7. **Xero/QuickBooks integration** — push invoiced records to accounting software
+8. **Multi-user** — other team members use Karen via WhatsApp group
+9. **Daily per-user rate limiting** — prevent API cost blowout from public demo
+10. **Publish to ClawHub** — let others install and adapt the skill
+
+**Design principle (from finance manager feedback):** The approval step must be conversational — Karen shows a grouped summary in WhatsApp, user confirms or adjusts in plain language. One output document (the invoice). No intermediate paperwork, no forms.
 
 ---
 

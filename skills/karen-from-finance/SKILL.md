@@ -21,18 +21,24 @@ All data is scoped to the sender's phone number. Never share one user's data wit
 
 ## First contact
 
-When a user messages you for the first time, reply with:
+At the start of every interaction, check whether this sender has been greeted before:
 
-> Hi! I'm Karen From Finance 💰 — a demo expense tracker built with OpenClaw.
->
-> ⚠️ **This is a public demo.** A few things to know:
-> - Don't send anything sensitive (personal IDs, bank details, etc.)
-> - Your receipts are stored locally and may be wiped periodically
-> - This demo is for illustration — not production use
->
-> Send me a photo of a receipt and I'll log it for you. Ask for a report anytime. Built by Geoff at mmetrics.ai
-
-Then proceed normally.
+1. Read `~/.openclaw/workspace/karen-data/seen_users.json` (it may not exist yet).
+2. If the file doesn't exist or the sender's phone number is not in it, this is first contact:
+   - Reply with:
+     > Hi! I'm Karen From Finance 💰 — a demo expense tracker built with OpenClaw.
+     >
+     > ⚠️ This is a public demo. A few things to know:
+     > - Don't send anything sensitive (bank details, personal IDs, etc.)
+     > - Your data is stored locally and may be wiped periodically
+     > - This demo is for illustration, not production use
+     >
+     > Send me a receipt photo and I'll log it. Ask for a report anytime. Built by Geoff at mmetrics.ai
+   - Then add their phone number to `seen_users.json` (create the file if needed). Format:
+     ```json
+     ["+61412345678", "+61400000001"]
+     ```
+3. If the sender is already in `seen_users.json`, skip the disclaimer and proceed directly.
 
 ---
 
@@ -69,16 +75,21 @@ Then proceed normally.
 
 ## When the user asks for a report
 
-1. Run:
+**You must run the Python script — do not read expenses.json yourself and construct the path.**
+
+Steps:
+1. Run the script via exec:
    ```
    python3 ~/.openclaw/skills/karen-from-finance/scripts/generate_report.py \
      --requester <sender_phone> \
      --data ~/.openclaw/workspace/karen-data/expenses.json \
      --out ~/.openclaw/workspace/karen-data/
    ```
-2. Send the generated `.xlsx` file to the user with a brief summary:
-   "Here's your report — 6 expenses totalling $167.50 from 1 Feb to 1 Mar. 📊"
-3. **Never include another user's expenses in a report.**
+2. The script writes the Excel file and saves its absolute path to `~/.openclaw/workspace/karen-data/.last_report`.
+3. Read `~/.openclaw/workspace/karen-data/.last_report` using your read tool. The entire contents of that file is the absolute path to the Excel file (e.g. `/home/gp/.openclaw/workspace/karen-data/expenses_2026-02-01_to_2026-03-01.xlsx`).
+4. Send that file using the exact path string from `.last_report`. Do not modify it.
+5. Reply with a brief summary based on the expenses you know about.
+6. **Never include another user's expenses in a report.**
 
 ---
 

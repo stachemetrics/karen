@@ -27,66 +27,53 @@ No app. No login. No training. Just WhatsApp.
 - **Node.js ≥22** — required by OpenClaw
 - **Python 3.12** — pinned in `.python-version`
 - **openpyxl** — already installed in `.venv`
-- **An Anthropic API key** — stored in `.env` as `ANTHROPIC_API_KEY`
+- **An Anthropic API key**
 
 ---
 
-## Local setup
-
-### 1. Install OpenClaw
+## Setup
 
 ```bash
-npm install -g openclaw@latest
+cp .env.example .env
+# edit .env and add your ANTHROPIC_API_KEY
+
+./setup.sh
 ```
 
-Verify:
+`setup.sh` is idempotent — safe to re-run. It handles:
+- `openclaw onboard` (non-interactive, local mode)
+- WhatsApp channel config (open policy, 👀 ack reaction)
+- Agent identity (Karen 💰)
+- Workspace files (SOUL.md, IDENTITY.md, USER.md)
+- Skill symlink (`~/.openclaw/skills/karen-from-finance`)
+- Data directory (`~/.openclaw/workspace/karen-data/`)
+- Gateway systemd service + API key injection
+
+### Connect WhatsApp (once per machine)
+
+Karen needs a dedicated phone number (prepaid SIM works):
 
 ```bash
-openclaw --version
-openclaw doctor
+openclaw channels login --channel whatsapp
 ```
 
-### 2. Onboard
+Scan the QR from Karen's dedicated phone (WhatsApp → Settings → Linked Devices → Link a Device).
 
-Run the interactive setup wizard. It configures the Gateway, initialises the workspace, and registers your API key.
+Verify the connection:
+```bash
+openclaw channels status
+```
+
+### Test without WhatsApp
 
 ```bash
-openclaw onboard --install-daemon
+openclaw dashboard   # opens http://127.0.0.1:18789/
 ```
 
-When prompted for the AI provider, select **Anthropic** and enter your key.
+Send `"hello"` — Karen should reply with her first-contact disclaimer.
+Send `"give me my expense report"` — she should run the Python script and return an Excel file.
 
-> ```bash
-> export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY .env | cut -d= -f2)
-> ```
-
-### 3. Install the skill
-
-Symlink the skill from this repo into OpenClaw's skills directory:
-
-```bash
-mkdir -p ~/.openclaw/skills
-ln -s $(pwd)/skills/karen-from-finance ~/.openclaw/skills/karen-from-finance
-```
-
-Verify OpenClaw picks it up:
-
-```bash
-openclaw skills list
-```
-
-`karen-from-finance` should appear in the list.
-
-### 4. Create the data directory
-
-```bash
-mkdir -p ~/.openclaw/workspace/karen-data
-cp sample-data/expenses.json ~/.openclaw/workspace/karen-data/expenses.json
-```
-
-### 5. Test the Excel generator
-
-Verify the report script works before connecting WhatsApp:
+### Test the Excel generator directly
 
 ```bash
 source .venv/bin/activate
@@ -95,59 +82,32 @@ python3 skills/karen-from-finance/scripts/generate_report.py \
   --requester +61400000001 \
   --data ~/.openclaw/workspace/karen-data/expenses.json \
   --out /tmp/
+# Expected: 4 expenses, $112.50 total
 
-# Expected output:
-# Report saved: /tmp/expenses_2026-02-01_to_2026-03-01.xlsx
-# 4 expenses | $112.50 total | 2026-02-01 to 2026-03-01
-```
-
-Open the `.xlsx` to confirm formatting (headers, currency, totals row).
-
-Test the second demo user (should show 1 expense only):
-
-```bash
 python3 skills/karen-from-finance/scripts/generate_report.py \
   --requester +61400000002 \
   --data ~/.openclaw/workspace/karen-data/expenses.json \
   --out /tmp/
+# Expected: 1 expense, $25.00 total
 ```
-
-### 6. Test locally via the OpenClaw dashboard
-
-Start the Gateway:
-
-```bash
-openclaw gateway
-```
-
-Open the dashboard:
-
-```bash
-openclaw dashboard
-```
-
-Send a message to Karen and verify she replies. Try: `"Give me my expense report"`.
-
-### 7. Connect WhatsApp (full demo)
-
-Karen needs a dedicated phone number (see `agents.md` — a prepaid SIM works):
-
-```bash
-openclaw channels login --channel whatsapp
-```
-
-Scan the QR code from Karen's dedicated phone. Once connected, send a message from your personal phone to Karen's number and verify the round-trip works.
 
 ---
 
 ## Project structure
 
 ```
+setup.sh                           # One-command setup (run this first)
+
 skills/
 └── karen-from-finance/
     ├── SKILL.md                   # Agent playbook (receipts, reports, reminders)
     └── scripts/
         └── generate_report.py    # Excel report generator
+
+workspace/
+    ├── SOUL.md                    # Karen's personality (copied to ~/.openclaw/workspace/)
+    ├── IDENTITY.md                # Karen's identity
+    └── USER.md                    # User context template
 
 sample-data/
 └── expenses.json                 # Pre-loaded test data (two demo users)

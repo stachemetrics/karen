@@ -2,3 +2,9 @@
 .env
 local/
 todo.md
+
+# Generated output
+*.xlsx
+
+# Never commit live openclaw state
+.openclaw/

@@ -102,12 +102,15 @@ def build_workbook(expenses: list[dict]) -> tuple[openpyxl.Workbook, str]:
         )
         ws.column_dimensions[col_letter].width = max(max_len + 2, 10)
 
-    # Build filename
+    # Build filename — include a timestamp so the agent cannot guess the path
+    # from conversation memory and is forced to use the .last_report pointer.
+    import time as _time
+    ts = int(_time.time())
     if expenses:
         start, end = date_range(expenses)
-        filename = f"expenses_{start}_to_{end}.xlsx"
+        filename = f"expenses_{start}_to_{end}_{ts}.xlsx"
     else:
-        filename = f"expenses_{date.today()}.xlsx"
+        filename = f"expenses_{date.today()}_{ts}.xlsx"
 
     return wb, filename
 
@@ -118,6 +121,9 @@ def main():
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA, help="Path to expenses.json")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="Output directory")
     args = parser.parse_args()
+
+    args.data = args.data.expanduser().resolve()
+    args.out = args.out.expanduser().resolve()
 
     expenses = load_expenses(args.data, args.requester)
 
@@ -133,7 +139,13 @@ def main():
 
     total = sum(e.get("total", 0) for e in expenses)
     start, end = date_range(expenses)
-    print(f"Report saved: {out_path}")
+
+    # Write the absolute path to a pointer file so the agent can read it
+    # without parsing stdout.
+    pointer = args.out / ".last_report"
+    pointer.write_text(str(out_path))
+
+    print(f"OK: {out_path}")
     print(f"{len(expenses)} expenses | ${total:.2f} total | {start} to {end}")
 
 
