@@ -1,22 +1,26 @@
 # Karen From Finance
 
-WhatsApp expense tracker built with [OpenClaw](https://openclaw.ai). Snap a photo of a receipt, send it to Karen, and get a clean Excel report on demand to help with invoicing.
+> *Named after the legendary [Karen From Finance](https://www.karenfromfinance.com), Sydney's fiercest drag queen. She handles the books, darling — so you don't have to.*
+
+WhatsApp expense tracker built with [OpenClaw](https://openclaw.ai). Snap a photo of a receipt, send it to Karen, and get a clean Excel report on demand.
 
 [Prototype #3 of 42](https://mmetrics.ai) — mmetrics.ai
 
 ---
-## What it does
-SME's providing services have trouble logging time and materials for effective invoicing. 
-Karen from finance simplifies this process into a WhatsApp conversation.
 
----
+## The problem
 
-## How it works
+Small businesses and sole traders doing services work have the same headache: receipts pile up in your camera roll, time gets logged on scraps of paper, and invoicing happens at 11pm the night before it's due. You don't need an app — you need someone who'll just handle it.
 
-1. Send Karen a photo of a receipt on WhatsApp
-2. Karen reads it, confirms the details, and logs it
-3. Ask for a report — she sends an Excel file
-4. Ask her to remind you — she sets a recurring WhatsApp reminder that you can cancel at any time.
+## Meet Karen
+
+Karen From Finance turns WhatsApp into your expense tracker and invoicing assistant. Like her drag queen namesake, she's sharp, she's organised, and she doesn't suffer fools — but she'll always get your numbers right.
+
+1. **Send a receipt photo** — Karen reads it, confirms the details, logs it
+2. **Log your time** — "3 hours on Acme today" and she'll track it
+3. **Ask for a report** — she sends a formatted Excel file with just your data
+4. **Set a reminder** — "remind me every Friday at 5pm" and she will
+5. **Invoice a client** — she'll show you what's unbilled, you confirm, she generates it
 
 No app. No login. No training. Just WhatsApp.
 
@@ -134,6 +138,14 @@ openclaw cron add \
 ```
 
 Users can also set their own reminders by messaging Karen directly — see `agents.md` for the full design.
+
+---
+
+## Why "Karen From Finance"?
+
+[Karen From Finance](https://www.karenfromfinance.com) is the stage name of Richard Sawyer, a Sydney drag queen who burst onto the scene on RuPaul's Drag Race Down Under. Sharp-tongued, immaculately presented, and named after everyone's favourite person in accounts payable — she's the perfect namesake for an AI that tracks your receipts and doesn't let you forget your expenses.
+
+This project is a fan tribute. If you're in Sydney, go see her live.
 
 ---
 

@@ -216,8 +216,9 @@ metadata:
 ### When the user asks for a report:
 1. Run: `python3 {baseDir}/scripts/generate_report.py --requester <sender_phone>`
 2. The script reads expenses.json, filters to only that requester's expenses, and produces an Excel file.
-3. Send the file to the user with a summary: "Here's your report — 6 expenses totalling $167.50 from Feb 1 to Mar 1."
-4. **Never include another user's expenses in a report.**
+3. In your reply, include `MEDIA:<path>` on its own line (where `<path>` is the absolute path from `.last_report`). OpenClaw will attach the file as a WhatsApp document.
+4. Add a brief summary: "Here's your report — 6 expenses totalling $167.50 from Feb 1 to Mar 1. 📊"
+5. **Never include another user's expenses in a report.**
 
 ### When the user asks to edit or delete an expense:
 1. Only show/modify expenses belonging to the requesting user's phone number.
@@ -256,7 +257,7 @@ metadata:
 1. Run `openclaw cron list --json`, filter to the sender's reminders as above.
 2. If they specified a number (e.g. "cancel reminder 1"), match it to the list. If they said "cancel reminder" without a number and they have exactly one, cancel it directly. If multiple, ask which one.
 3. Confirm the name of the reminder being cancelled before removing it.
-4. Run via bash: `openclaw cron remove --name "<name>"`
+4. Run via bash: `openclaw cron remove <jobId>`
 5. Confirm: "Done — that reminder is cancelled. ✅"
 
 ### Tone:
@@ -470,7 +471,7 @@ Any user can ask Karen to set a recurring reminder from within their WhatsApp co
 - Karen never lists or cancels another user's reminders
 - Public demo cap: max 3 active reminders per phone number
 - To list all active crons (admin view): `openclaw cron list`
-- To remove a user's reminder manually (admin): `openclaw cron remove --name <name>`
+- To remove a user's reminder manually (admin): `openclaw cron remove <jobId>`
 
 ---
 

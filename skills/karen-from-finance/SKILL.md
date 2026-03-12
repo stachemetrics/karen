@@ -87,7 +87,12 @@ Steps:
    ```
 2. The script writes the Excel file and saves its absolute path to `~/.openclaw/workspace/karen-data/.last_report`.
 3. Read `~/.openclaw/workspace/karen-data/.last_report` using your read tool. The entire contents of that file is the absolute path to the Excel file (e.g. `/home/gp/.openclaw/workspace/karen-data/expenses_2026-02-01_to_2026-03-01.xlsx`).
-4. Send that file using the exact path string from `.last_report`. Do not modify it.
+4. In your reply, include a `MEDIA:` directive on its own line with the exact path from `.last_report`. This tells OpenClaw to attach the file as a WhatsApp document. Format:
+   ```
+   Here's your report — 6 expenses totalling $167.50 from Feb 1 to Mar 1. 📊
+   MEDIA:/home/gp/.openclaw/workspace/karen-data/expenses_2026-02-01_to_2026-03-01_1709550000.xlsx
+   ```
+   The `MEDIA:` line must be on its own line with no leading spaces. Do not wrap it in backticks or markdown formatting.
 5. Reply with a brief summary based on the expenses you know about.
 6. **Never include another user's expenses in a report.**
 

@@ -1,0 +1,37 @@
+# note - malformed input
+[
+    {
+        "name": "1. first-message",
+        "input": "Hello Karen",
+        "output_text": "Hey Geoff! 👋💰 What can I help with today? Got receipts to scan, time to log, or need a report?",
+        "comment": "Karen should provide a disclaimer - public number, risk disclaimer, etc."
+    },
+    {
+        "name": "2. upload-reciept",
+        "input": "Please log my receipt to the TARA account {./sample-data/sample-receipt.jpg}",
+        "output_text": """Hi! I'm Karen From Finance 💰 — a demo expense tracker built with OpenClaw.
+
+⚠️ This is a public demo. A few things to know:
+- Don't send anything sensitive (bank details, personal IDs, etc.)
+- Your data is stored locally and may be wiped periodically
+- This demo is for illustration, not production use
+
+Send me a receipt photo and I'll log it. Ask for a report anytime. Built by Geoff at mmetrics.ai
+
+---
+
+Got it — $19.40 at Australia Post on 7 Feb 2026. Logged to TARA. 🧾
+
+- Tracked mail envelope (large C4) — $9.40
+- 14x B&W prints — $7.00
+- 3x colour prints — $3.00
+- GST: $1.76 (per receipt)""",
+        "comment": "the disclaimer should not be repeated if already provided previously"        
+    },
+    {
+        "name": "3. provide-report",
+        "input": "Please give me a expense report for the TARA account",
+        "output_text": "Hey Geoff! 👋💰 What can I help with today? Got receipts to scan, time to log, or need a report?",
+        "comment": "Karen should provide a disclaimer - public number, risk disclaimer, etc."
+    },    
+]
